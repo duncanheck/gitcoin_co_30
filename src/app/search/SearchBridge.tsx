@@ -1,18 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSearch } from "@/context/SearchContext";
 
 export default function SearchBridge() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/";
+  const rawFrom = searchParams.get("from") || "/";
+  const from = /^\/(?!\/)/.test(rawFrom) ? rawFrom : "/";
   const { setModalOpen, setOnDismiss } = useSearch();
 
   // Register redirect callback for when user dismisses modal/sidebar
   useEffect(() => {
     setOnDismiss(() => {
-      window.location.href = from;
+      router.push(from);
     });
     return () => setOnDismiss(null);
   }, [from, setOnDismiss]);
